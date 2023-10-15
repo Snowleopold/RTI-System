@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import math as mt
 import os
 
-nodenum=16
-linknum=80
-weights=np.load('tikweights.npy')
+nodenum=16    #Number of nodes
+linknum=80    #Number of links
+weights=np.load('tikweights.npy')    #Load the (w^T*w + alpha*I)^-1 * w^T matrix
 print("Weights loaded")
 obj=serial.Serial('COM3',115200)
 li=[]
-axis2=101
-axis1=101
+axis2=101    #Number of pixels in the first dimension
+axis1=101    #Number of pixels in the second dimension
 size=(nodenum*(nodenum-1))
 scanned=False
 num=0
