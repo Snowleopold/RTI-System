@@ -66,7 +66,6 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
 }
 
 void setup() {
-  // put your setup code here, to run once:
   WiFi.mode(WIFI_AP_STA);
   Serial.begin(115200);
   esp_now_init();
@@ -83,16 +82,11 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   if(receive){
     n=WiFi.scanNetworks(false,false,false,500,1);
     int tim=0;
     while(tim<size){
-      // Serial.println("trying");
       for(int i=0;i<n;i++){
-        // Serial.print(WiFi.SSID(i));
-        // Serial.print("    ");
-        // Serial.println(ssidlist[tim]);
         if(strcmp(WiFi.SSID(i).c_str(),ssidlist[tim])==0){
           datapack.value[tim++]=WiFi.RSSI(i);
           found=true;
