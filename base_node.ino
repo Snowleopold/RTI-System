@@ -50,19 +50,12 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
   memcpy(&recvpack,incomingdata,sizeof(recvpack));
   if(strcmp(boosted,recvpack.info)==0){
     count++;
-    // Serial.println(count);
-    // Serial.print(++count);
-    // Serial.print('/');
-    // Serial.println(total);
     if(count==total){
-      // Serial.println("All nodes set!");
       count=0;
       t1=millis();
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
-      // Serial.println("Sent packet to all nodes");
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
-      // Serial.println("Sent check packet to node#1");
       expect=1;
       Serial.write('s');
     }
@@ -70,9 +63,6 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
   else if(strcmp(tran,recvpack.info)==0){
     for(int i=1;i<=total;i++){
       if(maccompare(emitterlist[i-1],mac,6)){
-        // Serial.print("Packet from node#");
-        // Serial.print(i);
-        // Serial.println(" is received");
         if(i==expect){
           nodenum=i;
         }
@@ -85,45 +75,31 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
     for(int i=0;i<(total-1);i++){
       values[done++]=(-recvpack.value[i]);
     }
-    // Serial.print("Number of data collected: ");
-    // Serial.println(done);
     if(nodenum==total){
       done=0;
       t2=millis();
-      // Serial.println("All data collected");
-      // Serial.print("Data: ");
       for(int i=0;i<((total)*(total-1));i++){
-        // Serial.print(values[i]);
         Serial.write(values[i]);
         if(i==((total)*(total-1)-1)){
-          // Serial.println();
         }
         else{
-          // Serial.print("  ");
         }
       }
-      // Serial.print("Time required: ");
-      // Serial.println(t2-t1);
       t1=t2;
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
-      // Serial.println("Sent packet to all nodes");
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
-      // Serial.println("Sent check packet to node#1");
       expect=1;
       Serial.write('s');
     }
     else{
       esp_now_send(emitterlist[nodenum],(uint8_t*) &checkpack,sizeof(checkpack));
-      // Serial.print("Sent check packet to node#");
-      // Serial.println(nodenum+1);
       expect=nodenum+1;
     }
   }
 }
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   esp_now_init();
