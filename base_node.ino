@@ -29,7 +29,7 @@ uint8_t emitter14[]={0xA8,0x42,0xE3,0xCA,0x75,0x10};
 uint8_t emitter15[]={0xA8,0x42,0xE3,0xCB,0x77,0xC4};
 uint8_t emitter16[]={0xB0,0xA7,0x32,0x2A,0xD2,0x70};
 uint8_t* emitterlist[]={emitter1,emitter2,emitter3,emitter4,emitter5,emitter6,emitter7,emitter8,emitter9,emitter10,emitter11,emitter12,emitter13,emitter14,emitter15,emitter16};
-short values[total*(total-1)];
+uint8_t values[total*(total-1)];
 
 bool maccompare(const uint8_t* mac1,const uint8_t* mac2,int len){
   for(int i=0;i<len;i++){
@@ -40,7 +40,7 @@ bool maccompare(const uint8_t* mac1,const uint8_t* mac2,int len){
 
 typedef struct packet{
   char info[32];
-  short value[total-1];
+  uint8_t value[total-1];
 } packet;
 
 packet recvpack,sendpack,checkpack;
@@ -52,7 +52,6 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
     count++;
     if(count==total){
       count=0;
-      t1=millis();
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
@@ -73,19 +72,13 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
       }
     }
     for(int i=0;i<(total-1);i++){
-      values[done++]=(-recvpack.value[i]);
+      values[done++]=recvpack.value[i];
     }
     if(nodenum==total){
       done=0;
-      t2=millis();
       for(int i=0;i<((total)*(total-1));i++){
         Serial.write(values[i]);
-        if(i==((total)*(total-1)-1)){
-        }
-        else{
-        }
       }
-      t1=t2;
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
