@@ -10,48 +10,15 @@ bool receive=false;
 const char* boosted="boost";
 const char* tran="transfer";
 const char* checkmsg="check";
-const char* ssid1="node1";
-const char* ssid2="node2";
-const char* ssid3="node3";
-const char* ssid4="node4";
-const char* ssid5="node5";
-const char* ssid6="node6";
-const char* ssid7="node7";
-const char* ssid8="node8";
-const char* ssid9="node9";
-const char* ssid10="node10";
-const char* ssid11="node11";
-const char* ssid12="node12";
-const char* ssid13="node13";
-const char* ssid14="node14";
-const char* ssid15="node15";
-const char* ssid16="node16";
 const char* pass="53732394";
 uint8_t base[]={0xB0,0xA7,0x32,0x2A,0x68,0x6C};
-const char* emitterlist[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
+const char* emitterlist[]={"node1", "node2", "node3", "node4", "node5", "node6", "node7", "node8", "node9", "node10", "node11", "node12", "node13", "node14", "node15", "node16"};
 int size=total-1;
-const char** ssidlist;
-const char* route1[]={ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route2[]={ssid1,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route3[]={ssid1,ssid2,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route4[]={ssid1,ssid2,ssid3,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route5[]={ssid1,ssid2,ssid3,ssid4,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route6[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route7[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route8[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route9[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route10[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid11,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route11[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid12,ssid13,ssid14,ssid15,ssid16};
-const char* route12[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid13,ssid14,ssid15,ssid16};
-const char* route13[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid14,ssid15,ssid16};
-const char* route14[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid15,ssid16};
-const char* route15[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid16};
-const char* route16[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15};
-const char** routelist[]={route1,route2,route3,route4,route5,route6,route7,route8,route9,route10,route11,route12,route13,route14,route15,route16};
+const char* ssidlist[total - 1];
 
 typedef struct packet{
   char info[32];
-  short value[total-1];
+  uint8_t value[total-1];
 } packet;
 
 packet datapack,sendpack,dummy;
@@ -74,7 +41,10 @@ void setup() {
   peerinfo.channel=0;
   peerinfo.encrypt=false;
   esp_now_add_peer(&peerinfo);
-  ssidlist=routelist[num-1];
+  for(int i=0,j=0;i<total;i++){
+    if(i==num-1) continue;
+    else ssidlist[j++]=emitterlist[i];
+  }
   strcpy(sendpack.info,boosted);
   strcpy(datapack.info,tran);
   esp_now_send(base,(uint8_t*) &sendpack,sizeof(sendpack));
@@ -88,7 +58,7 @@ void loop() {
     while(tim<size){
       for(int i=0;i<n;i++){
         if(strcmp(WiFi.SSID(i).c_str(),ssidlist[tim])==0){
-          datapack.value[tim++]=WiFi.RSSI(i);
+          datapack.value[tim++]=(-WiFi.RSSI(i));
           found=true;
           break;
         }
