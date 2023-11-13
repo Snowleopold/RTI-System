@@ -53,6 +53,7 @@ void setup() {
 
 void loop() {
   if(receive){
+    receive=false;
     n=WiFi.scanNetworks(false,false,false,500,1);
     int tim=0;
     while(tim<size){
@@ -68,11 +69,11 @@ void loop() {
     }
     tim=0;
     while(!check){
+      if(receive) return;
       delay(100);
     };
     WiFi.enableAP(false);
     esp_now_send(base,(uint8_t*) &datapack,sizeof(datapack));
-    receive=false;
     check=false;
     WiFi.enableAP(true);
   }
