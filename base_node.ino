@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <esp_now.h>
 
+const int TIMEOUT_LIMIT=5000;
 int done=0;
 int nodenum;
 const int total=16;
@@ -38,6 +39,7 @@ bool maccompare(const uint8_t* mac1,const uint8_t* mac2,int len){
   return true;
 }
 
+
 typedef struct packet{
   char info[32];
   uint8_t value[total-1];
@@ -55,6 +57,7 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
+      t1=millis();
       expect=1;
       Serial.write('s');
     }
@@ -82,11 +85,13 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
       esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
       delay(500);
       esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
+      t1=millis();
       expect=1;
       Serial.write('s');
     }
     else{
       esp_now_send(emitterlist[nodenum],(uint8_t*) &checkpack,sizeof(checkpack));
+      t1=millis();
       expect=nodenum+1;
     }
   }
@@ -109,4 +114,13 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  t2=millis();
+  if(t2-t1>=TIMEOUT_LIMIT){
+    expect=1;
+    done=0;
+    esp_now_send(0,(uint8_t*) &sendpack,sizeof(sendpack));
+    delay(500);
+    esp_now_send(emitter1,(uint8_t*) &checkpack,sizeof(checkpack));
+    t1=millis();
+  }
 }
