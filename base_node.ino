@@ -12,7 +12,7 @@ const char* tran="transfer";
 const char* win1="Station ";
 const char* win2=" boosted!";
 const char* checkmsg="check";
-uint8_t emitter1[]={0xA8,0x42,0xE3,0xCA,0x89,0xAC};
+uint8_t emitter1[]={0xA8,0x42,0xE3,0xCA,0x89,0xAC};    // MAC Addresses of the measuring nodes
 uint8_t emitter2[]={0xB0,0xA7,0x32,0xF3,0x96,0x68};
 uint8_t emitter3[]={0xB0,0xA7,0x32,0x29,0xF0,0x50};
 uint8_t emitter4[]={0xA8,0x42,0xE3,0xCA,0x23,0xBC};
@@ -31,14 +31,14 @@ uint8_t emitter16[]={0xB0,0xA7,0x32,0x2A,0xD2,0x70};
 uint8_t* emitterlist[]={emitter1,emitter2,emitter3,emitter4,emitter5,emitter6,emitter7,emitter8,emitter9,emitter10,emitter11,emitter12,emitter13,emitter14,emitter15,emitter16};
 short values[total*(total-1)];
 
-bool maccompare(const uint8_t* mac1,const uint8_t* mac2,int len){
+bool maccompare(const uint8_t* mac1,const uint8_t* mac2,int len){    //Check whether two MAC addresses are same
   for(int i=0;i<len;i++){
     if(mac1[i]!=mac2[i]) return false;
   }
   return true;
 }
 
-typedef struct packet{
+typedef struct packet{      //Packet for ESP-NOW protocol to send to the base node
   char info[32];
   short value[total-1];
 } packet;
@@ -46,9 +46,9 @@ typedef struct packet{
 packet recvpack,sendpack,checkpack;
 esp_now_peer_info_t peerinfo;
 
-void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
+void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){      //Callback function when a ESP-NOW packet is received
   memcpy(&recvpack,incomingdata,sizeof(recvpack));
-  if(strcmp(boosted,recvpack.info)==0){
+  if(strcmp(boosted,recvpack.info)==0){      //To count the booting of measuring nodes
     count++;
     if(count==total){
       count=0;
@@ -60,7 +60,7 @@ void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
       Serial.write('s');
     }
   }
-  else if(strcmp(tran,recvpack.info)==0){
+  else if(strcmp(tran,recvpack.info)==0){    //RSSI data collection for packets sent from measuring nodes
     for(int i=1;i<=total;i++){
       if(maccompare(emitterlist[i-1],mac,6)){
         if(i==expect){
