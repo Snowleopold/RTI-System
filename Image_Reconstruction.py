@@ -32,7 +32,7 @@ while True:
             li.append(data[i])
         arr = np.array(li)
         arr = arr.reshape((nodenum, nodenum - 1))
-        if scanned == False:        ##Background RSSI data
+        if scanned == False:        #Background RSSI data
             scanpixels[num] = arr
             num+=1
             print('Scanning environment...'+str(num)+'/'+str(scansize))
@@ -41,7 +41,7 @@ while True:
                 arravg = np.transpose(arravg)
                 arravg*=-1
                 scanned = True
-        else:            ##Image Reconstruction
+        else:            #Image Reconstruction
             arr = np.transpose(arr)
             arr*=-1
             o = oct2py.octave.recon(weights, axis1, arravg, arr)
