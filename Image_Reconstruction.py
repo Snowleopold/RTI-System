@@ -32,7 +32,7 @@ while True:
             li.append(data[i])
         arr = np.array(li)
         arr = arr.reshape((nodenum, nodenum - 1))
-        if scanned == False:        ##Background subtraction
+        if scanned == False:        ##Background RSSI data
             scanpixels[num] = arr
             num+=1
             print('Scanning environment...'+str(num)+'/'+str(scansize))
