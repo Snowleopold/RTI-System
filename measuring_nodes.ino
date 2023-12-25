@@ -49,7 +49,7 @@ const char* route15[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssi
 const char* route16[]={ssid1,ssid2,ssid3,ssid4,ssid5,ssid6,ssid7,ssid8,ssid9,ssid10,ssid11,ssid12,ssid13,ssid14,ssid15};
 const char** routelist[]={route1,route2,route3,route4,route5,route6,route7,route8,route9,route10,route11,route12,route13,route14,route15,route16};
 
-typedef struct packet{
+typedef struct packet{    //ESP-NOW packet
   char info[32];
   short value[total-1];
 } packet;
@@ -57,7 +57,7 @@ typedef struct packet{
 packet datapack,sendpack,dummy;
 esp_now_peer_info_t peerinfo;
 
-void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){
+void ondatarecv(const uint8_t* mac,const uint8_t* incomingdata,int len){    //Callback function when ESP-NOW packet from the base node is received
   memcpy(&dummy,incomingdata,sizeof(dummy));
   if(strcmp(dummy.info,checkmsg)==0) check=true;
   else{
@@ -81,7 +81,7 @@ void setup() {
   WiFi.softAP(emitterlist[num-1],pass,1);
 }
 
-void loop() {
+void loop() {    //RSSI data collection from every other node
   if(receive){
     n=WiFi.scanNetworks(false,false,false,500,1);
     int tim=0;
